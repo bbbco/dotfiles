@@ -1,0 +1,23 @@
+colorscheme solarized
+
+" Enable PasteMode on F2
+nnoremap <F2> :set invpaste paste?<CR>
+set pastetoggle=<F2>
+set showmode
+
+" Clipboard
+set clipboard=unnamedplus
+
+" Disable Syntax Highlighting During Diffing
+if &diff | syntax off | endif
+
+" Remove whitespace via <F5>
+:nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
+
+" Neocomplete Fixes
+let g:neocomplete#force_overwrite_completefunc = 0
+let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
+let g:neocomplcache_enable_camel_case_completion = 1
+let g:neocomplcache_enable_underbar_completion = 1
+" Neocomplete remove completes when moving around in insert mode.
+let g:neocomplcache_enable_insert_char_pre = 1

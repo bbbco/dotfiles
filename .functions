@@ -1,0 +1,11 @@
+# Use .... to cd
+for i in {1..9};do c=;d=;for u in `eval echo {1..$i}`;do c="$c../";d="$d..";eval "$d(){ cd $c;}"; eval "$d.(){ cd $c;}";done;done
+
+# jsoncat
+function jsoncat(){ cat "${1}" | python -mjson.tool; }
+
+# Epoch Converter
+function epoch() { date -d "@${1:0: -3}" ${*:2}; }
+function upoch() { TZ='UTC-0' epoch ${*}; }
+
+

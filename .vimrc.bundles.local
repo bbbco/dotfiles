@@ -1,0 +1,2 @@
+" Add Robot Framework Syntaxing
+Bundle 'mfukar/robotframework-vim'
