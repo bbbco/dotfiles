@@ -1,0 +1,8 @@
+--type-add=dsl:ext:dsl
+--type-add=enum:ext:enum
+--type-add=csv:ext:csv
+--type-add=robot:ext:robot,json,py
+--type-add=pom:is:pom.xml
+--type-add=sphinx:ext:rst
+--type-add=rst:ext:rst
+--type-add=avroschema:ext:avsc

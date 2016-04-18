@@ -1,4 +1,27 @@
-colorscheme solarized
+let g:lucius_no_term_bg = 1
+colorscheme lucius
+LuciusBlack
+"hi clear IndentGuidesOdd
+
+"hi clear Normal
+"hi Normal       ctermfg=254 guifg=#d0d0d0 ctermbg=16 guibg=#00005F cterm=none gui=none
+
+"let g:indent_guides_auto_colors = 0
+"hi IndentGuidesOdd   ctermbg=232
+"hi IndentGuidesEven   ctermbg=236
+
+"set ts=4 sw=4 noet
+
+"colorscheme gruvbox
+"colorscheme marklar
+
+""colorscheme solarized
+""let g:solarized_termcolors=256
+
+" Complete keywords from not imported modules (could make completion slower)
+" Enable autoimport used modules
+call pymode#default('g:pymode_rope_autoimport', 0)
+
 
 " Enable PasteMode on F2
 nnoremap <F2> :set invpaste paste?<CR>
@@ -21,3 +44,19 @@ let g:neocomplcache_enable_camel_case_completion = 1
 let g:neocomplcache_enable_underbar_completion = 1
 " Neocomplete remove completes when moving around in insert mode.
 let g:neocomplcache_enable_insert_char_pre = 1
+
+" Spell check for markdown
+autocmd BufRead,BufNewFile *.rst,*.md setlocal spell
+set wrap
+set linebreak
+
+" Simply underline misspelled words
+hi clear SpellBad
+hi SpellBad cterm=underline
+
+map <F7> mzgg=G`z
+
+"let g:syntastic_ruby_checkers = ['rubocop']
+"
+
+autocmd FileType python map <buffer> <F3> :call Flake8()<CR>

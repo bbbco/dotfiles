@@ -1,2 +1,5 @@
 " Add Robot Framework Syntaxing
 Bundle 'mfukar/robotframework-vim'
+Bundle 'tpope/vim-bundler'
+Bundle 'nvie/vim-flake8'
+Bundle "powerline/powerline"
