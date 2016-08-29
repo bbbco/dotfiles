@@ -6,3 +6,4 @@
 --type-add=sphinx:ext:rst
 --type-add=rst:ext:rst
 --type-add=avroschema:ext:avsc
+--type-add=r:ext:r,R
