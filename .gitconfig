@@ -1,0 +1,25 @@
+[push]
+	default = simple
+[user]
+	name = Brian Goad
+	useconfigonly = true
+[core]
+	editor = vim
+[merge]
+	tool = meld
+[pager]
+	log = perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less
+	show = perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less
+	diff = perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less
+[pull]
+	rebase = true
+[alias]
+	diff-last = diff @~..@
+	unstage = reset HEAD
+    uncommit = reset --soft HEAD^
+    work-config = config user.email "bgoad@tivo.com"
+    github-config = config user.email "bdgoad@gmail.com"
+[gc]
+	auto = 1
+[fetch]
+	prume = true

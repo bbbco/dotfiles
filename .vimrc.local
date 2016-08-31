@@ -24,7 +24,7 @@ call pymode#default('g:pymode_rope_autoimport', 0)
 
 
 " Enable PasteMode on F2
- nnoremap <F2> :set invpaste paste?<CR>
+nnoremap <F2> :set invpaste paste?<CR>
 set showmode
 
 let &t_SI .= "\<Esc>[?2004h"
@@ -45,8 +45,7 @@ set clipboard=unnamedplus
 if &diff | syntax off | endif
 
 " Remove whitespace via <F5>
-set expandtab
-:nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
+:nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab! <CR>
 
 " Neocomplete Fixes
 let g:neocomplete#force_overwrite_completefunc = 0
