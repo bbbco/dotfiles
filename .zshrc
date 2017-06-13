@@ -108,3 +108,6 @@ zstyle ':completion:*' group-name ''
 unsetopt HIST_IGNORE_ALL_DUPS
 unsetopt HIST_IGNORE_DUPS
 
+
+export NVM_DIR="/home/bgoad/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm

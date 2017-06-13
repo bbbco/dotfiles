@@ -6,7 +6,10 @@
 --type-add=sphinx:ext:rst
 --type-add=rst:ext:rst
 --type-add=avroschema:ext:avsc
+--type-add=avro:ext:avro
 --type-add=r:ext:r,R
-
-
+--type-add=markdown:ext:md,markdown
+--type-add=properties:ext:properties
+--type-add=script:ext:sh,py,rb
+--type-add=xml:ext:xml
 --pager=less -FRSX

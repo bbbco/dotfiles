@@ -1,6 +1,8 @@
+set shell=/bin/sh
+
 let g:lucius_no_term_bg = 1
 colorscheme lucius
-LuciusBlack
+"LuciusBlack
 "hi clear IndentGuidesOdd
 
 "hi clear Normal
@@ -48,12 +50,38 @@ if &diff | syntax off | endif
 :nnoremap <silent> <F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR> :retab! <CR>
 
 " Neocomplete Fixes
+set backspace=indent,eol,start
+
 let g:neocomplete#force_overwrite_completefunc = 0
-let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-let g:neocomplcache_enable_camel_case_completion = 1
-let g:neocomplcache_enable_underbar_completion = 1
+let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+"let g:neocomplcache_enable_camel_case_completion = 1
+"let g:neocomplcache_enable_underbar_completion = 1
 " Neocomplete remove completes when moving around in insert mode.
-let g:neocomplcache_enable_insert_char_pre = 1
+let g:neocomplete#enable_insert_char_pre = 1
+inoremap <expr><CR> neosnippet#expandable() ? neosnippet#mappings#expand_or_jump_impl() : pumvisible() ? neocomplete#close_popup() : "\<CR>"
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <Left> neocomplete#close_popup() . "\<Left>"
+inoremap <expr> <Right> neocomplete#close_popup() . "\<Right>"
+inoremap <expr> <Up> neocomplete#close_popup() . "\<Up>"
+inoremap <expr> <Down> neocomplete#close_popup() . "\<Down>"
+inoremap <expr> <Cr> neocomplete#close_popup() . "\<Cr>"
+inoremap <expr> <C-?> neocomplete#smart_close_popup() . "\<BS>"
+let g:spf13_noninvasive_completion = 1
+
+" Ruby is an oddball in the family, use special spacing/rules
+if v:version >= 703
+  " Note: Relative number is quite slow with Ruby, so is cursorline
+  autocmd FileType ruby setlocal ts=2 sts=2 sw=2 norelativenumber nocursorline
+else
+  autocmd FileType ruby setlocal ts=2 sts=2 sw=2
+endif
+augroup ft_rb
+    au!
+    " fix the SLOOOW syntax highlighting
+    au FileType ruby setlocal re=1 foldmethod=manual
+augroup END
+
+
 
 " Spell check for markdown
 autocmd BufRead,BufNewFile *.rst,*.md setlocal spell
@@ -66,7 +94,16 @@ hi SpellBad cterm=underline
 
 map <F7> mzgg=G`z
 
-"let g:syntastic_ruby_checkers = ['rubocop']
-"
+let g:pymode_options_max_line_length=120
+let g:syntastic_python_checkers=['flake8']
+let g:syntastic_python_flake8_args='--ignore=E501,E225'
+let g:syntastic_python_checker_args = "--max-line-length=160"
+let g:syntastic_ruby_checkers = ['rubocop']
 
-autocmd FileType python map <buffer> <F3> :call Flake8()<CR>
+" Copy / paste
+vmap <leader>y :w! /tmp/.vim_tmp_clipboard<CR>
+nmap <leader>p :r! cat /tmp/.vim_tmp_clipboard<CR>
+
+" NERDCommenter align comments to the left
+let g:NERDDefaultAlign = "start"
+let g:NERDRemoveExtraSpaces = "false"

@@ -3,3 +3,5 @@ Bundle 'mfukar/robotframework-vim'
 Bundle 'tpope/vim-bundler'
 Bundle 'nvie/vim-flake8'
 Bundle "powerline/powerline"
+Bundle 'Konfekt/FastFold'
+Bundle 'Konfekt/FoldText'
