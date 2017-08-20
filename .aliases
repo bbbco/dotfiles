@@ -1,4 +1,4 @@
-if [ -n ${WORK_DIR} ]; then
+if [ -n "${WORK_DIR}" ]; then
     # Source Work Aliases
     source ${WORK_DIR}/.aliases
 fi
