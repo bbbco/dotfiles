@@ -56,7 +56,7 @@ HIST_STAMPS="yyyy-mm-dd"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git aws copyfile cp gem github jsontools ssh-agent knife python pylint rvm sudo svn virtualenv vundle safe-paste )
-plugins=(git aws copyfile cp gem github jsontools ssh-agent knife python pylint rvm sudo svn virtualenv vundle )
+plugins=(git aws copyfile cp gem github jsontools ssh-agent knife python pylint rvm sudo svn virtualenv vundle zsh-syntax-highlighting )
 
 # User configuration
 # export PATH="$PATH:/home/bgoad/.rvm/gems/ruby-2.1.0/bin:/home/bgoad/.rvm/gems/ruby-2.1.0@global/bin:/home/bgoad/.rvm/rubies/ruby-2.1.0/bin:/opt/chef/embedded/bin:/home/bgoad/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/bgoad/.rvm/bin:/home/bgoad/.rvm/bin:/home/bgoad/.bin"
