@@ -63,10 +63,10 @@ plugins=(git aws copyfile cp gem github jsontools ssh-agent knife python pylint 
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
+source ~/.profile
 source ~/.aliases
 source ~/.functions
 
-source ~/.profile
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
 # You may need to manually set your language environment

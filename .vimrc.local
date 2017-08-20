@@ -107,3 +107,8 @@ nmap <leader>p :r! cat /tmp/.vim_tmp_clipboard<CR>
 " NERDCommenter align comments to the left
 let g:NERDDefaultAlign = "start"
 let g:NERDRemoveExtraSpaces = "false"
+
+" Add Robot support
+let g:NERDCustomDelimiters = {
+    \ 'robot': { 'left': '#' }
+    \ }

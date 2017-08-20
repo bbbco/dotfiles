@@ -22,8 +22,9 @@
     github-config = config user.email "bdgoad@gmail.com"
     hard-reset = reset --hard
     save = !sh -c 'export PREV=$(git symbolic-ref HEAD|cut -d/ -f3-) && git checkout -b "$1" && git commit -am "$1" && git checkout "$PREV"' -
-    discard = checkout -- 
-
+	discard = checkout -- 
+	current-branch = !git symbolic-ref -q --short HEAD || git describe --tags --exact-match
+	pushit = !git push 2> /dev/null || git push  --set-upstream origin $(git current-branch)
 [gc]
 	auto = 1
 [fetch]

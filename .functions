@@ -2,7 +2,7 @@
 for i in {1..9};do c=;d=;for u in `eval echo {1..$i}`;do c="$c../";d="$d..";eval "$d(){ cd $c;}"; eval "$d.(){ cd $c;}";done;done
 
 # jsoncat
-function jsoncat(){ ocat "${1}" | python -mjson.tool; }
+function jsoncat(){ cat "${1}" | python -mjson.tool; }
 
 # json2yaml
 function json2yaml(){
@@ -26,25 +26,25 @@ function epoch2time() { date -d "@${1:0: -3}" ${*:2}; }
 function upoch2time() { TZ='UTC-0' epoch2time ${*}; }
 function time2epoch() { echo "$(date -d "${1}" +%s)000"; }
 function time2upoch() { echo "$(TZ='UTC-0' date -d "${1}" +%s)000"; }
-
+function istdate() { TZ='Asia/Kolkata' date ${@} }
 
 # Testing Dir
-function tdd() {
+function td() {
     if [ -n "$1" ]; then
         DATE="$(date -d ${1} +%Y%m%d)"
     else
         DATE="$(date +%Y%m%d)"
     fi
-    echo "${HOME}/digitalsmiths/testing/${DATE}"
+    TD="${HOME}/digitalsmiths/testing/${DATE}"
+    if [ ! -d "${TD}" ]; then
+        mkdir "${TD}"
+    fi
+    echo "${TD}"
 }
 
-function td() {
-    TD=$(tdd ${@})
-    if [ -d "${TD}" ]; then
-        cd ${TD}
-    else
-        mkdir ${TD}; cd ${TD}
-    fi
+function _td() {
+    TD=$(td ${@})
+    cd ${TD}
 }
 
 # Send alert when previous command fails
@@ -69,40 +69,6 @@ function sshdqs() {
     ssh -i /home/bgoad/digitalsmiths/svn/discovery/scalability/devqa-scalability.pem -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no -o CanonicalizeHostname=yes -o CanonicalDomains=digitalsmithsdev.net -l root ${@};
 }
 
-# Chef
-function bump-cookbook-versions(){
-    VERSION=$1
-    REGEXP="^[0-9]+\.[0-9]+\.[0-9]+$"
-    if [[ ! $VERSION =~ $REGEXP ]]; then
-        echo "Version \"${VERSION}\" is not a valid expected version. Should match /${REGEXP}/"
-        return 1
-    fi
-    NEXT_ID=$(echo ${VERSION} | sed 's/\./_/g')
-    cd ~/digitalsmiths/git/product/chef-dev
-    PREV_CHEF_ENV=$(ls environments/chef-*.rb | grep -v 'chef-master' | sort -r | head -n1)
-    NEXT_CHEF_ENV="environments/chef-$(echo ${VERSION} | cut -d. -f-2 | tr '.' '-').rb"
-    ls ${NEXT_CHEF_ENV} 2> /dev/null || cp ${PREV_CHEF_ENV} ${NEXT_CHEF_ENV}
-    sed -i "/version/ s/[0-9]\+\.[0-9]\+\.[0-9]\+/${VERSION}/" cookbooks/*/metadata.rb
-    sed -i "s/[0-9]\+\.[0-9]\+\.[0-9]\+/${VERSION}/" environments/chef-master.rb ${NEXT_CHEF_ENV}
-    sed -i "s/chef-[0-9]\+-[0-9]\+-[0-9]\+/${NEXT_ID}/" ${NEXT_CHEF_ENV}
-    PREV_CHEF_DEFAULTS=$(ls -1d data_bags/defaults/* | grep -v 'qa' | sort -rn | head -1)
-    NEXT_CHEF_DEFAULTS="data_bags/defaults/${NEXT_ID}.json"
-    cp ${PREV_CHEF_DEFAULTS} ${NEXT_CHEF_DEFAULTS}
-    sed -i "/\"id\":/ s/[0-9]\+_[0-9]\+_[0-9]/${NEXT_ID}/" ${NEXT_CHEF_DEFAULTS}
-    cd chef-cookbooks
-    git add cookbooks/*/metadata.rb
-    git commit -m "Bump Cookbooks to ${VERSION}"
-    git add ${NEXT_CHEF_DEFAULTS}
-    git commit -m "Bump Default Data Bag to ${VERSION}"
-    git push
-    cd ..
-    git sync-cookbooks
-    git add environments/chef-master.rb ${NEXT_CHEF_ENV}
-    git commit -m "Bump Environments to ${VERSION}"
-    git push
-    echo "Bumped to ${VERSION}!"
-}
-
 knife-replace-db(){
 
 #    DBI="$(grep '"id":' "${1}" | cut -d\" -f4)"
@@ -114,32 +80,21 @@ knife-replace-db(){
 #    knife data bag show ${DB} -F json > "${FILE}"
 }
 
-function merge-in-chef-trunk() {
-
-    DS_SVN="http://svn.digitalsmiths.com/svn/eng/chef"
-        CHEF_BRANCH=$(pwd | sed 's/.*\/chef\///')
-        BRANCH=${CHEF_BRANCH##*/}
-
-    mkdir /tmp/${BRANCH}_tmp
-        cd /tmp/${BRANCH}_tmp/
-        svn co ${DS_SVN}/${CHEF_BRANCH}
-    cd ${BRANCH}/
-    svn merge ${DS_SVN}/trunk/ --accept theirs-conflict
+function kdbd-push() {
+    if [ -z "${1}" ]; then
+        echo "No file passed!"
+        return 1
+    fi
+    kdbd ${1} || { echo "Fix issue!"; return 1; } && {
+        git add ${1}
+        git commit -m "${1} update"
+        git stash
+        git pull
+        git push
+        git stash pop
+    }
 }
 
-function merge-chef-branch-to-trunk(){
-
-    DS_SVN="http://svn.digitalsmiths.com/svn/eng/chef"
-        CHEF_BRANCH=$(pwd | sed 's/.*\/chef\///')
-        BRANCH=${CHEF_BRANCH##*/}
-
-    mkdir /tmp/trunk_tmp
-        cd /tmp/trunk_tmp/
-        svn co ${DS_SVN}/trunk
-        cd trunk/
-        svn merge ${DS_SVN}/${CHEF_BRANCH} --accept working
-
-}
 
 function decode_url() {
     ruby -e "require 'uri'; puts URI.decode_www_form_component(\"${1}\")"
@@ -186,67 +141,30 @@ function ffs_mvn_build() {
         cd ${orig_dir}
     ffs_docker_up
 }
-#function ffs_docker_up() {
-#    local orig_dir=$(pwd)
-#        cd $(ffs_docker_path)
-#        docker-compose -p $(git_branch) up -d --build
-#        cd ${orig_dir}
-#    ffs_docker_ports
-#}
-#function ffs_docker_down() {
-#    local orig_dir=$(pwd)
-#        cd $(ffs_docker_path)
-#        docker-compose -p $(git_branch) down
-#        cd ${orig_dir}
-#}
 
-#function ffs_docker_restart() {
-#    local orig_dir=$(pwd)
-#        cd $(ffs_docker_path)
-#        docker-compose -p $(git_branch) restart ${@}
-#    cd ${orig_dir}
-#}
-#function ffs_docker_ps() {
-#    local orig_dir=$(pwd)
-#    { cd $(ffs_docker_path) && docker-compose -p $(git_branch) ps; } ||
-#    { echo "Cannot find docker-compose; reverting to 'docker ps'" && docker ps; }
-#    cd ${orig_dir}
-#}
-
-#function ffs_docker_ports() {
-#    local orig_dir=$(pwd)
-#        cd $(ffs_docker_path)
-#        export FFS_ADMIN_PORT=$(docker-compose -p $(git_branch) port ffs-admin 8080 | cut -d: -f2)
-#        export FFS_PORT=$(docker-compose -p $(git_branch) port ffs 8080 | cut -d: -f2)
-#        export CATALOG_PORT=$(docker-compose -p $(git_branch) port catalog-server 8888 | cut -d: -f2)
-#        echo "FFS_ADMIN:${FFS_ADMIN_PORT}"
-#        echo "FFS:${FFS_PORT}"
-#        echo "CATALOG:${CATALOG_PORT}"
-#        cd ${orig_dir}
-#}
-#function ffs_docker_logs() {
-#    local orig_dir=$(pwd)
-#        cd $(ffs_docker_path)
-#        docker-compose -p $(git_branch) logs --tail ${1:-50} -f ffs ffs-admin
-#        cd ${orig_dir}
-#}
-#function ffs_docker_ssh() {
-#    local orig_dir=$(pwd)
-#        cd $(ffs_docker_path)
-#        docker  exec -it ${1} bash
-#        cd ${orig_dir}
-#}
+function delete_from_history() {
+    if [ -z ${@} ]; then
+        echo "No idea what you're trying to cover up!"
+    fi
+    LC_ALL=C sed -i "/${@}/d" ${HISTFILE}
+}
 
 function emr_logs() {
-    s3_path="${1%/}"
-    if [ -z "${s3_path}" ]; then
-        echo "No path found! Please pass an s3 path!"
-        exit 1
+    if [ "${#*}" -eq 2 ]; then
+        jobid="${1}"
+        stepid="${2}"
+        s3_path="s3://ds-dwh-qa/qa-si-ec2-insight-0/emr/logs/${jobid}/steps/${stepid}"
+    elif [ "${#*}" -eq 1 ]; then
+        s3_path="${1%/}"
+        jobid=$(echo ${s3_path} | rev | cut -d \/ -f 3 | rev )
+        stepid=$(echo ${s3_path} | rev | cut -d \/ -f 1 | rev )
     fi
-    jobid=$(echo ${s3_path} | rev | cut -d \/ -f 1 | rev )
-    stepid=$(echo ${s3_path} | rev | cut -d \/ -f 3 | rev )
-    td
-    mkdir "${jobid}-${stepid}"
-    cd "${jobid}-${stepid}"
+    if [ -z "${s3_path}" ]; then
+        echo "No path found! Please pass an s3 path or cluster id and step ids!"
+        return 1
+    fi
+    _td
+    mkdir -p "${jobid}/${stepid}"
+    cd "${jobid}/${stepid}"
     aws s3 cp ${s3_path} . --recursive
 }

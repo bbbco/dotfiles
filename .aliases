@@ -1,0 +1,37 @@
+if [ -n ${WORK_DIR} ]; then
+    # Source Work Aliases
+    source ${WORK_DIR}/.aliases
+fi
+
+# Shell
+alias ducks='du -cks * | sort -rn | head'
+
+# Listing
+alias lsa='ls -d $PWD/*'
+alias lsf='find $(pwd) -name'
+
+# CURL
+alias curlpost='curl -iv -H "Content-Type:application/json;charset=UTF-8" -X POST'
+alias curlget='curl -i -H -X GET ${@} 2> /dev/null'
+function curlgetjson() { curl -X GET ${@} 2> /dev/null | python -c 'import json, sys; print json.dumps(json.loads(sys.stdin.read()), ensure_ascii=False, indent=4, sort_keys=True, separators=(",", ": ")).encode("utf-8")'; }
+function curlgetxml() { curl -X GET ${@} 2> /dev/null | xmllint --format -; }
+#function curlgetdata() { curl -X GET ${@} 2> /dev/null | python -mjson.tool; }
+alias curlput='curl -iv -H "Content-Type:application/json;charset=UTF-8" -X PUT'
+alias curldelete='curl -iv -H "Content-Type:application/json;charset=UTF-8" -X DELETE'
+
+# PS
+alias psgrep='ps aux | grep'
+
+# Lorem ipsum
+alias lorem='echo "LoremipsumdolorsitametconsecteturadipiscingelitDonecadiamlectusSedsitametipsummaurisMaecenascongueligulaacquamviverranecconsecteturantehendreritDonecetmollisdolorPraesentetdiamegetliberoegestasmattissitametvitaeaugue"'
+
+alias epoch-now='date +%s'
+alias simple-server='cd ~/server/; python -m SimpleHTTPServer'
+
+alias lol='notify-send "LOL" "HA HA HAH AH HA HAHHA HAH AHAH AHHAH AH HA HA HAH AH HA HA HAH HAHAH HAH HA HA HA HA ... HA .. HA HA, um HA"'
+
+# Exit
+alias exti='exit'
+alias eixt='exit'
+
+alias jp='jp.py'
