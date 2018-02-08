@@ -12,3 +12,6 @@ for dfile in $(ls -d1 .[^.]* | grep -v '^.git$'); do
 	ln -s ${DIRNAME}/${dfile} ~/${dfile}
 
 done
+
+echo "Importing Keyboard Custom Commands"
+dconf load /org/cinnamon/desktop/keybindings/ < keyboard.conf
