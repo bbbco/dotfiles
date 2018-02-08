@@ -31,3 +31,18 @@
 	prune = true
 [credential]
 	helper = cache
+[color]
+	ui = true
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = 70 bold
+	newHighlight = green bold 22
+[color "diff"]
+    plain = 250
+	meta = 240
+	frag = magenta bold
+	commit = 227 bold
+	old = red bold
+	new = 70 bold
+	whitespace = red reverse

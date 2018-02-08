@@ -22,11 +22,54 @@ with open(sys.argv[1]) as f:
 }
 
 # Epoch Converter
-function epoch2time() { date -d "@${1:0: -3}" ${*:2}; }
+function epoch2time() ( 
+    function e2t() {
+        if [ ${#EPOCH} -ge 13 ]; then
+            EPOCH=${1:0: -3}
+        else
+            EPOCH=${1}
+        fi
+        FORMAT=${*:2}
+        date -d "@${EPOCH}" ${FORMAT}
+    }
+    if [ ${1} == "-" ]; then
+        STDIN=($(</dev/stdin))
+        for S in ${STDIN}; do
+            e2t ${S} ${*:2}
+        done
+    else
+        e2t ${1} ${*:2}
+    fi
+)
 function upoch2time() { TZ='UTC-0' epoch2time ${*}; }
 function time2epoch() { echo "$(date -d "${1}" +%s)000"; }
 function time2upoch() { echo "$(TZ='UTC-0' date -d "${1}" +%s)000"; }
 function istdate() { TZ='Asia/Kolkata' date ${@} }
+function utcdate() { date -u ${@} }
+function since() { 
+    first=$(date -d "${1}" +%s)
+    second=$(date -d "${2}" +%s)
+    secs=$(( ${second} - ${first} ))
+    if [ ${secs} -lt 0 ]; then
+        secs=$(( ${secs} * -1 ))
+    fi
+    day=$(( 60*60*24 ))
+    days=$(( $secs / ${day}  ))
+    secs=$(( ${secs} - ( ${days} * ${day} )  ))
+    hour=$(( 60*60  ))
+    hours=$(( ${secs} / ${hour} ))
+    secs=$(( ${secs} - ( ${hours} * ${hour} ) ))
+    minute=$(( 60  ))
+    minutes=$(( ${secs} / ${minute} ))
+    secs=$(( ${secs} - ( ${minutes} * ${minute} ) ))
+    echo "First: $(date -d @${first}) ; Second: $(date -d @${second})"
+    echo "${days} days, ${hours} hours, ${minutes} minutes, ${secs} seconds"
+}
+
+# Only show hidden files
+function hidden() { 
+    ls -a "$@" | grep '^\.'
+}
 
 # Testing Dir
 function td() {
@@ -66,7 +109,7 @@ function sshaws() {
 }
 
 function sshdqs() {
-    ssh -i /home/bgoad/digitalsmiths/svn/discovery/scalability/devqa-scalability.pem -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no -o CanonicalizeHostname=yes -o CanonicalDomains=digitalsmithsdev.net -l root ${@};
+    ssh -i /home/bgoad/.ssh/pem_keys/devqa-scalability.pem -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no -o CanonicalizeHostname=yes -o CanonicalDomains=digitalsmithsdev.net -l root ${@};
 }
 
 knife-replace-db(){
@@ -88,6 +131,7 @@ function kdbd-push() {
     kdbd ${1} || { echo "Fix issue!"; return 1; } && {
         git add ${1}
         git commit -m "${1} update"
+        git reset HEAD chef-cookbooks
         git stash
         git pull
         git push
@@ -150,10 +194,10 @@ function delete_from_history() {
 }
 
 function emr_logs() {
-    if [ "${#*}" -eq 2 ]; then
+    if [ "${#*}" -ge 2 ]; then
         jobid="${1}"
         stepid="${2}"
-        s3_path="s3://ds-dwh-qa/qa-si-ec2-insight-0/emr/logs/${jobid}/steps/${stepid}"
+        s3_path="s3://ds-dwh-qa/${3:-qa-si-ec2-insight-0}/emr/logs/${jobid}/steps/${stepid}"
     elif [ "${#*}" -eq 1 ]; then
         s3_path="${1%/}"
         jobid=$(echo ${s3_path} | rev | cut -d \/ -f 3 | rev )

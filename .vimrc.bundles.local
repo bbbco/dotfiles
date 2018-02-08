@@ -5,3 +5,5 @@ Bundle 'nvie/vim-flake8'
 Bundle "powerline/powerline"
 Bundle 'Konfekt/FastFold'
 Bundle 'Konfekt/FoldText'
+Bundle 'AlessandroYorba/Sierra'
+Bundle 'tpope/vim-eunuch'

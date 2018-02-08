@@ -12,4 +12,5 @@
 --type-add=properties:ext:properties
 --type-add=script:ext:sh,py,rb
 --type-add=xml:ext:xml
+--type-add=j2:ext:j2
 --pager=less -FRSX

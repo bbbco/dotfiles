@@ -12,7 +12,7 @@ alias lsf='find $(pwd) -name'
 
 # CURL
 alias curlpost='curl -iv -H "Content-Type:application/json;charset=UTF-8" -X POST'
-alias curlget='curl -i -H -X GET ${@} 2> /dev/null'
+alias curlget='curl -i -X GET 2> /dev/null'
 function curlgetjson() { curl -X GET ${@} 2> /dev/null | python -c 'import json, sys; print json.dumps(json.loads(sys.stdin.read()), ensure_ascii=False, indent=4, sort_keys=True, separators=(",", ": ")).encode("utf-8")'; }
 function curlgetxml() { curl -X GET ${@} 2> /dev/null | xmllint --format -; }
 #function curlgetdata() { curl -X GET ${@} 2> /dev/null | python -mjson.tool; }
@@ -35,3 +35,13 @@ alias exti='exit'
 alias eixt='exit'
 
 alias jp='jp.py'
+
+# Shortcut to Home Dirs
+for d in $(ls -d ~/*/ | cut -d\/ -f4); do
+    alias _${d}="cd ${HOME}/${d}"
+done
+
+# Ack
+alias acks='ack --ignore-dir target'
+
+alias linesum="awk '{sum+=\$1} END {print sum}'"
