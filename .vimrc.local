@@ -3,6 +3,9 @@ set shell=/bin/sh
 "let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 "set termguicolors
 
+" Autoset YAML for inventory files in Ansible
+autocmd BufRead,BufNewFile ~/ansible/inventory/* setlocal filetype=yaml
+
 set background=dark
 
 "let g:sierra_Twilight = 1
@@ -11,7 +14,10 @@ set background=dark
 "colorscheme solarized 
 
 "let g:lucius_no_term_bg = 1
-colorscheme lucius
+"colorscheme lucius
+
+colorscheme dracula
+
 "LuciusBlack
 "hi clear IndentGuidesOdd
 
@@ -33,6 +39,11 @@ colorscheme lucius
 " Complete keywords from not imported modules (could make completion slower)
 " Enable autoimport used modules
 call pymode#default('g:pymode_rope_autoimport', 0)
+
+" Go sluggishness 
+let g:go_highlight_structs = 0
+let g:go_highlight_interfaces = 0
+let g:go_highlight_operators = 0
 
 
 " Enable PasteMode on F2
@@ -105,10 +116,14 @@ hi SpellBad cterm=underline
 map <F7> mzgg=G`z
 
 let g:pymode_options_max_line_length=120
-let g:syntastic_python_checkers=['flake8']
+let g:syntastic_python_checkers=['pycodestyle']
 let g:syntastic_python_flake8_args='--ignore=E501,E225'
 let g:syntastic_python_checker_args = "--max-line-length=160"
 let g:syntastic_ruby_checkers = ['rubocop']
+
+" JSONPath 
+"au FileType json noremap <buffer> <silent> <expr> <leader>e jsonpath#echo()
+"au FileType json noremap <buffer> <silent> <expr> <leader>g jsonpath#goto()
 
 " Copy / paste
 vmap <leader>y :w! /tmp/.vim_tmp_clipboard<CR>
@@ -122,3 +137,5 @@ let g:NERDRemoveExtraSpaces = "false"
 let g:NERDCustomDelimiters = {
     \ 'robot': { 'left': '#' }
     \ }
+
+

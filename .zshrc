@@ -98,6 +98,7 @@ alias zshconfig="vim ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+export PATH="$PATH:$HOME/go/bin" # Add GO to PATH for scripting
 
 # Completion testing
 zstyle ':completion:*' verbose yes
@@ -111,3 +112,30 @@ unsetopt HIST_IGNORE_DUPS
 
 export NVM_DIR="/home/bgoad/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# PY env
+export PATH="/home/bgoad/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# Function to toggle bracketed paste when needed
+#toggle-bracketed-paste(){
+#    echo -n "Toggling Bracketed Paste "
+#    if (( ${+zle_bracketed_paste} )); then
+#        echo "Off"
+#        unset zle_bracketed_paste
+#    else
+#        echo "On"
+#        autoload -Uz bracketed-paste-magic
+#        zle -N bracketed-paste bracketed-paste-magic
+#        bracketed-paste
+#    fi
+#    sleep 2
+#    zle redisplay
+#}
+#zle -N toggle-bracketed-paste
+#bindkey '^[^P' toggle-bracketed-paste
+
+eval "$(direnv hook zsh)"

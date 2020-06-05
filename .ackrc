@@ -11,6 +11,11 @@
 --type-add=markdown:ext:md,markdown
 --type-add=properties:ext:properties
 --type-add=script:ext:sh,py,rb
+--type-add=shell:ext:sh,bash,zsh
+--type-add=bash:ext:bash,sh
 --type-add=xml:ext:xml
+--type-add=rpm:ext:rpm
+--type-add=yml:ext:yml,yaml
 --type-add=j2:ext:j2
 --pager=less -FRSX
+--ignore-dir=target

@@ -4,7 +4,8 @@
 	name = Brian Goad
 	useconfigonly = true
 [core]
-	editor = vim
+    editor = vim
+    excludesFile = ~/.gitignore
 [merge]
 	tool = meld
 [pager]
@@ -25,12 +26,12 @@
 	discard = checkout -- 
 	current-branch = !git symbolic-ref -q --short HEAD || git describe --tags --exact-match
 	pushit = !git push 2> /dev/null || git push  --set-upstream origin $(git current-branch)
+    diff-latest-tag = !git diff $(git describe --abbrev=0 --tags)
 [gc]
 	auto = 1
 [fetch]
 	prune = true
 [credential]
-	helper = cache
 [color]
 	ui = true
 [color "diff-highlight"]
@@ -46,3 +47,7 @@
 	old = red bold
 	new = 70 bold
 	whitespace = red reverse
+[credential]
+	helper = cache
+[diff]
+	guitool = meld

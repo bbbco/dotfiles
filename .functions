@@ -1,14 +1,48 @@
 # Use .... to cd
-for i in {1..9};do c=;d=;for u in `eval echo {1..$i}`;do c="$c../";d="$d..";eval "$d(){ cd $c;}"; eval "$d.(){ cd $c;}";done;done
+#for i in {1..9};do c=;d=;for u in `eval echo {1..$i}`;do c="$c../";d="$d..";eval "$d(){ cd $c;}"; eval "$d.(){ cd $c;}";done;done
+
+# numstats
+function numstats(){
+    sort -n | awk '
+      BEGIN {
+        c = 0;
+        sum = 0;
+      }
+      $1 ~ /^(\-)?[0-9]*(\.[0-9]*)?$/ {
+        a[c++] = $1;
+        sum += $1;
+      }
+      END {
+        ave = sum / c;
+        if( (c % 2) == 1 ) {
+          median = a[ int(c/2) ];
+        } else {
+          median = ( a[c/2] + a[c/2-1] ) / 2;
+        }
+        OFS="\t";
+        print "Sum", "Count", "Average", "Median", "Min", "Max"
+        print sum, c, ave, median, a[0], a[c-1];
+      }
+    '
+}
 
 # jsoncat
 function jsoncat(){ cat "${1}" | python -mjson.tool; }
+
+function pyobj2json(){
+    python -c '
+import json, sys
+file_object = sys.stdin
+json_output = eval(file_object.read())
+print json.dumps(json_output)
+    ' $@
+}
 
 # json2yaml
 function json2yaml(){
     python -c '
 import sys, json, yaml
-with open(sys.argv[1]) as f:
+with open(sys.argv[1], 'r') if len(sys.argv) > 1 else sys.stdin as f:
     print yaml.safe_dump(json.load(f), default_flow_style=False)
         ' $@
 }
@@ -17,14 +51,14 @@ function yaml2json(){
     python -c '
 import yaml, json, sys
 with open(sys.argv[1]) as f:
-    json.dumps(yaml.load(f), sort_keys=True, indent=2)
+    print json.dumps(yaml.load(f), sort_keys=True, indent=2)
         ' $@
 }
 
 # Epoch Converter
-function epoch2time() ( 
+function epoch2time() (
     function e2t() {
-        if [ ${#EPOCH} -ge 13 ]; then
+        if [ ${#1} -ge 13 ]; then
             EPOCH=${1:0: -3}
         else
             EPOCH=${1}
@@ -105,7 +139,9 @@ function sshos() {
 }
 
 function sshaws() {
-    ssh -i /home/bgoad/.ssh/pem_keys/bgoad-aws.pem -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no -o CanonicalizeHostname=yes -o CanonicalDomains=digitalsmithsdev.net -l root ${@};
+    AWS_NODE=${1}
+    AWS_PEM="$(ec2-instance ${AWS_NODE} | jq '.KeyName' -r).pem"
+    ssh -i /home/bgoad/.ssh/pem_keys/${AWS_PEM} -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no -o CanonicalizeHostname=yes -o CanonicalDomains=digitalsmithsdev.net -l root ${AWS_NODE} "${@:2}"
 }
 
 function sshdqs() {
@@ -129,13 +165,13 @@ function kdbd-push() {
         return 1
     fi
     kdbd ${1} || { echo "Fix issue!"; return 1; } && {
+        git stash
+        git pull
+        git stash pop
         git add ${1}
         git commit -m "${1} update"
         git reset HEAD chef-cookbooks
-        git stash
-        git pull
         git push
-        git stash pop
     }
 }
 
@@ -211,4 +247,50 @@ function emr_logs() {
     mkdir -p "${jobid}/${stepid}"
     cd "${jobid}/${stepid}"
     aws s3 cp ${s3_path} . --recursive
+}
+
+function ansible_cp_inventory() {
+    old_deployment=$1
+    new_deployment=$2
+    cd ~/ansible/inventory/
+    for f in $(find . -name ${old_deployment}*); do
+        new_f=${f/${old_deployment}/${new_deployment}}
+        echo "copying ${f} to ${new_f}"
+        cp ${f} ${new_f}
+        sed -i "s/${old_deployment}/${new_deployment}/g" ${new_f}
+    done
+}
+
+function pos() {
+    STDIN=($(</dev/stdin))
+    POS=${1}
+    echo "${STDIN}" | tail -n 1
+    N=1
+    until [ ${N} -eq ${POS} ]; do
+      echo -n " "
+      N=$((N+1))
+    done
+    echo "^"
+}
+
+function s3_output() {
+    if [ -z "${1}" ]; then
+      echo "No S3 Path Specified"
+      return 1
+    fi
+    aws s3 cp ${1} -
+}
+
+alias human_size="awk '{ suffix=\"KMGT\"; for(i=0; \$1>1024 && i < length(suffix); i++) \$1/=1024; printf(\"%.2f %c%c\n\", \$1, substr(suffix, i, 1), \"B\")}'"
+
+function s3_size(){
+    aws s3 ls ${1} --recursive --summarize | tail -n1 | cut -d\: -f2 | human_size
+}
+
+function yjq() {
+    if [ "${1}" == "-j" ]; then
+        yq r ${2:-} -j
+    else
+        yq r ${2:-} -j | jq "${1}"
+    fi
 }

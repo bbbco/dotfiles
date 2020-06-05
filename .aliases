@@ -5,6 +5,7 @@ fi
 
 # Shell
 alias ducks='du -cks * | sort -rn | head'
+alias words='cat /usr/share/dict/words'
 
 # Listing
 alias lsa='ls -d $PWD/*'
@@ -27,6 +28,7 @@ alias lorem='echo "LoremipsumdolorsitametconsecteturadipiscingelitDonecadiamlect
 
 alias epoch-now='date +%s'
 alias simple-server='cd ~/server/; python -m SimpleHTTPServer'
+alias simple-server3='cd ~/server/; python -m http.server'
 
 alias lol='notify-send "LOL" "HA HA HAH AH HA HAHHA HAH AHAH AHHAH AH HA HA HAH AH HA HA HAH HAHAH HAH HA HA HA HA ... HA .. HA HA, um HA"'
 
