@@ -1,0 +1,7 @@
+display :0
+rfbauth /home/bgoad/.vnc/passwd
+bg
+forever
+repeat
+skip_dups
+dontdisconnect
