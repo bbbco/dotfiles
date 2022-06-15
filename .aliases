@@ -40,10 +40,14 @@ alias jp='jp.py'
 
 # Shortcut to Home Dirs
 for d in $(ls -d ~/*/ | cut -d\/ -f4); do
-    alias _${d}="cd ${HOME}/${d}"
+    # Creates an alias as long as the command doesn't already exist
+    type _${d} &>/dev/null || alias _${d}="cd ${HOME}/${d}"
 done
 
 # Ack
 alias acks='ack --ignore-dir target'
 
 alias linesum="awk '{sum+=\$1} END {print sum}'"
+
+
+alias gmem="ps x -o rss,command | awk '/Google/{s+=\$1}END{print s/1024/1024\"G\"}'"

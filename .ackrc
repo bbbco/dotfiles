@@ -19,3 +19,4 @@
 --type-add=j2:ext:j2
 --pager=less -FRSX
 --ignore-dir=target
+--ignore-dir=dist

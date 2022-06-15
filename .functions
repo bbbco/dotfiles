@@ -80,7 +80,7 @@ function time2epoch() { echo "$(date -d "${1}" +%s)000"; }
 function time2upoch() { echo "$(TZ='UTC-0' date -d "${1}" +%s)000"; }
 function istdate() { TZ='Asia/Kolkata' date ${@} }
 function utcdate() { date -u ${@} }
-function since() { 
+function since() {
     first=$(date -d "${1}" +%s)
     second=$(date -d "${2}" +%s)
     secs=$(( ${second} - ${first} ))
@@ -101,27 +101,35 @@ function since() {
 }
 
 # Only show hidden files
-function hidden() { 
+function hidden() {
     ls -a "$@" | grep '^\.'
 }
 
-# Testing Dir
-function td() {
-    if [ -n "$1" ]; then
-        DATE="$(date -d ${1} +%Y%m%d)"
+# Daily Working Dir
+function dwd() {
+    if [[ $(uname) == "Darwin" ]]; then
+      if [ -n "$1" ]; then
+          DATE="$(gdate -d ${1} +%Y%m%d)"
+      else
+          DATE="$(gdate +%Y%m%d)"
+      fi
     else
-        DATE="$(date +%Y%m%d)"
+      if [ -n "$1" ]; then
+          DATE="$(date -d ${1} +%Y%m%d)"
+      else
+          DATE="$(date +%Y%m%d)"
+      fi
     fi
-    TD="${HOME}/digitalsmiths/testing/${DATE}"
-    if [ ! -d "${TD}" ]; then
-        mkdir "${TD}"
+    DWD="${HOME}/dwd/${DATE}"
+    if [ ! -d "${DWD}" ]; then
+        mkdir "${DWD}"
     fi
-    echo "${TD}"
+    echo "${DWD}"
 }
 
-function _td() {
-    TD=$(td ${@})
-    cd ${TD}
+function _dwd() {
+    DWD=$(dwd ${@})
+    cd ${DWD}
 }
 
 # Send alert when previous command fails
@@ -229,25 +237,6 @@ function delete_from_history() {
     LC_ALL=C sed -i "/${@}/d" ${HISTFILE}
 }
 
-function emr_logs() {
-    if [ "${#*}" -ge 2 ]; then
-        jobid="${1}"
-        stepid="${2}"
-        s3_path="s3://ds-dwh-qa/${3:-qa-si-ec2-insight-0}/emr/logs/${jobid}/steps/${stepid}"
-    elif [ "${#*}" -eq 1 ]; then
-        s3_path="${1%/}"
-        jobid=$(echo ${s3_path} | rev | cut -d \/ -f 3 | rev )
-        stepid=$(echo ${s3_path} | rev | cut -d \/ -f 1 | rev )
-    fi
-    if [ -z "${s3_path}" ]; then
-        echo "No path found! Please pass an s3 path or cluster id and step ids!"
-        return 1
-    fi
-    _td
-    mkdir -p "${jobid}/${stepid}"
-    cd "${jobid}/${stepid}"
-    aws s3 cp ${s3_path} . --recursive
-}
 
 function ansible_cp_inventory() {
     old_deployment=$1
@@ -293,4 +282,17 @@ function yjq() {
     else
         yq r ${2:-} -j | jq "${1}"
     fi
+}
+
+function sfdx_remote_diff() {
+    remote=$1
+    diff_file=$2
+    SFDX_DIFF_JSON=$(sfdx force:source:diff -p ${diff_file} -u ${remote} --json)
+    git diff $(echo ${SFDX_DIFF_JSON} | jq '.result.remote' -r) $(echo ${SFDX_DIFF_JSON} | jq '.result.local' -r)
+}
+
+jdk() {
+    version=$1
+    export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+    java -version
 }

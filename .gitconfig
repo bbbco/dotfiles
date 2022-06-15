@@ -7,11 +7,11 @@
     editor = vim
     excludesFile = ~/.gitignore
 [merge]
-	tool = meld
+	tool = vscode
 [pager]
-	log = perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less -XF
-	show = perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less -XF
-	diff = perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight | less -XF
+	log = perl $(dirname $(git --info-path))/git-core/contrib/diff-highlight/diff-highlight | less -XF
+	show = perl $(dirname $(git --info-path))/git-core/contrib/diff-highlight/diff-highlight | less -XF
+	diff = perl $(dirname $(git --info-path))/git-core/contrib/diff-highlight/diff-highlight | less -XF
 [pull]
 	rebase = true
 [alias]
@@ -19,7 +19,7 @@
 	diff-staged = diff --cached
 	unstage = reset HEAD
     uncommit = reset --soft HEAD^
-    work-config = config user.email "bgoad@tivo.com"
+    work-config = config user.email "Brian.Goad@genesys.com"
     github-config = config user.email "bdgoad@gmail.com"
     hard-reset = reset --hard
     save = !sh -c 'export PREV=$(git symbolic-ref HEAD|cut -d/ -f3-) && git checkout -b "$1" && git commit -am "$1" && git checkout "$PREV"' -
@@ -48,6 +48,11 @@
 	new = 70 bold
 	whitespace = red reverse
 [credential]
-	helper = cache
+	helper = osxkeychain
 [diff]
 	guitool = meld
+	tool = vscode
+[mergetool "vscode"]
+	cmd = code --wait $MERGED
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
