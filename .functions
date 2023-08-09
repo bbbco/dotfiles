@@ -1,6 +1,9 @@
 # Use .... to cd
 #for i in {1..9};do c=;d=;for u in `eval echo {1..$i}`;do c="$c../";d="$d..";eval "$d(){ cd $c;}"; eval "$d.(){ cd $c;}";done;done
 
+# gdate == gnu date in mac; create alias if not available
+which gdate &> /dev/null || alias gdate='date'
+
 # numstats
 function numstats(){
     sort -n | awk '
@@ -64,9 +67,9 @@ function epoch2time() (
             EPOCH=${1}
         fi
         FORMAT=${*:2}
-        date -d "@${EPOCH}" ${FORMAT}
+        gdate -d "@${EPOCH}" ${FORMAT}
     }
-    if [ ${1} == "-" ]; then
+    if [[ ${1} == "-" ]]; then
         STDIN=($(</dev/stdin))
         for S in ${STDIN}; do
             e2t ${S} ${*:2}
@@ -76,13 +79,13 @@ function epoch2time() (
     fi
 )
 function upoch2time() { TZ='UTC-0' epoch2time ${*}; }
-function time2epoch() { echo "$(date -d "${1}" +%s)000"; }
-function time2upoch() { echo "$(TZ='UTC-0' date -d "${1}" +%s)000"; }
-function istdate() { TZ='Asia/Kolkata' date ${@} }
-function utcdate() { date -u ${@} }
+function time2epoch() { echo "$(gdate -d "${1}" +%s)000"; }
+function time2upoch() { echo "$(TZ='UTC-0' gdate -d "${1}" +%s)000"; }
+function istdate() { TZ='Asia/Kolkata' gdate ${@} }
+function utcdate() { gdate -u ${@} }
 function since() {
-    first=$(date -d "${1}" +%s)
-    second=$(date -d "${2}" +%s)
+    first=$(gdate -d "${1}" +%s)
+    second=$(gdate -d "${2}" +%s)
     secs=$(( ${second} - ${first} ))
     if [ ${secs} -lt 0 ]; then
         secs=$(( ${secs} * -1 ))
@@ -296,3 +299,20 @@ jdk() {
     export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
     java -version
 }
+
+# Plucks a line out of stdin or a file
+pluckl() {
+    local linenum=${1} 
+    local input=""
+    if [[ -p /dev/stdin ]]; then
+      input="$(cat -)"
+    elif [[ -e "${2}" ]]; then 
+      input="$(cat ${2})"
+    fi
+
+    if [[ -z "${input}" ]] || [[ -z "${linenum}" ]]; then
+      return 1
+    fi
+
+    echo "${input}" | head -n ${linenum} | tail -n 1
+} 
